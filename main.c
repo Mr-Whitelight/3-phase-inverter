@@ -26,9 +26,9 @@ extern Uint16 RamfuncsRunStart;
 #endif
 
 #define pai   3.141592
-#define F     50.0        //电压频率50Hz
-#define Ld     0.05     //直轴电感 H
-#define Lq     0.05     //交轴电感 H
+#define F     50.0        //鐢靛帇棰戠巼50Hz
+#define Ld     0.05     //鐩磋酱鐢垫劅 H
+#define Lq     0.05     //浜よ酱鐢垫劅 H
 
 interrupt void epwm2_isr(void);
 ADC_GET Voltage_get=ADC_GET_DEFAULTS;
@@ -51,13 +51,13 @@ volatile float P_REF=10.0,Q_REF=0.0;
 volatile float32 Theta_out=0.0;
 volatile float Ud=0.0,Uq=0.0,Ud0=0.0,Uq0=0.0,Id0=0.0,Iq0=0.0;
 
-/**********Power PI 参数***************/
-volatile float KPp=0.001,KPi=0.1;         //有功功率调节PI参数
-volatile float KQp=-0.001,KQi=-0.1;       //无功功率调节PI参数
+/**********Power PI 鍙傛暟***************/
+volatile float KPp=0.001,KPi=0.1;         //鏈夊姛鍔熺巼璋冭妭PI鍙傛暟
+volatile float KQp=-0.001,KQi=-0.1;       //鏃犲姛鍔熺巼璋冭妭PI鍙傛暟
 
-/**********Current PI 参数***************/
-volatile float Id_P=5,Id_I=0.0001;     //Id电流调节PI参数
-volatile float Iq_P=5,Iq_I=0.0001;   //Iq电流调节PI参数
+/**********Current PI 鍙傛暟***************/
+volatile float Id_P=5,Id_I=0.0001;     //Id鐢垫祦璋冭妭PI鍙傛暟
+volatile float Iq_P=5,Iq_I=0.0001;   //Iq鐢垫祦璋冭妭PI鍙傛暟
 
 
 
@@ -174,16 +174,16 @@ interrupt void epwm2_isr(void)
     Vabc_to_Vdq.calc(&Vabc_to_Vdq);
 
 
-/*
+
     /////////////Current PARK//////////////
     Iabc_to_Idq.As=Voltage_get.Ia;
     Iabc_to_Idq.Bs=Voltage_get.Ib;
     Iabc_to_Idq.Cs=Voltage_get.Ic;
     Iabc_to_Idq.Theta=Theta_out;
     Iabc_to_Idq.calc(&Iabc_to_Idq);
-*/
 
-/*
+
+
     ///////Power calculator//////////////
     power_cal.Id=Iabc_to_Idq.Ds;
     power_cal.Iq=Iabc_to_Idq.Qs;
@@ -195,7 +195,7 @@ interrupt void epwm2_isr(void)
     active_power_controller.Fbk=power_cal.P;
     active_power_controller.Kp=KPp;
     active_power_controller.Ki=KPi;
-    CNTL_PI_F_FUNC(&active_power_controller);   //启动有功功率调节
+    CNTL_PI_F_FUNC(&active_power_controller);   //鍚姩鏈夊姛鍔熺巼璋冭妭
 
     ///////////////D axis Current PI/////////////////
     dcurrent_controller.Ref=active_power_controller.Out;
@@ -222,10 +222,7 @@ interrupt void epwm2_isr(void)
     ///////////DQ axis Voltage output/////////////////
     Ud=Vabc_to_Vdq.Ds+dcurrent_controller.Out-2*pai*F*Lq*Iq0;
     Uq=Vabc_to_Vdq.Qs+qcurrent_controller.Out+2*pai*F*Lq*Id0;
-    */
-
-    Ud=Vabc_to_Vdq.Ds;
-    Uq=Vabc_to_Vdq.Qs;
+    
 
     splll.v_q[0]=Uq;
     SPLL_3ph_SRF_F_FUNC(&splll);
